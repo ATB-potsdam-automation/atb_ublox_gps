@@ -1,0 +1,19 @@
+rover:
+  ros__parameters:
+    device: /dev/rover
+    frame_id: rover
+    config_on_startup: False
+    # TMODE3 Config
+    # tmode3: 0                   # Survey-In Mode
+    uart1:
+      baudrate: 460800
+      in: 32
+      out: 0
+    config_on_startup: False
+    nav:
+        rate: 8
+        
+    publish:
+      all: true
+      nmea: true
+

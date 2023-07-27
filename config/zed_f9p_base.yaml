@@ -1,0 +1,21 @@
+base:
+  ros__parameters:
+    device: /dev/base
+    frame_id: base
+    uart1:
+      baudrate: 460800
+      in: 0
+      out: 32
+    usb:
+      in: 32
+      out: 2
+    config_on_startup: False
+    nav:
+        rate: 8
+
+    tmode3: 0 
+
+    publish:
+      all: False
+
+
