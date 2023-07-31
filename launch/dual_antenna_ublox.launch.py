@@ -33,32 +33,36 @@
 """Launch two ublox gps nodes with zed_f9p_rover and zed_f9p_base configuration."""
 
 import os
-from ament_index_python.packages import get_package_share_directory
-import launch
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 
-
-def generate_launch_description():
-    config_directory = os.path.join(
-        get_package_share_directory('atb_ublox_gps'),
-        'config')
-    rover_params = os.path.join(config_directory, 'zed_f9p_rover.yaml')
+def generate_launch_description():   
+    
+    rover_params = PathJoinSubstitution([
+                    FindPackageShare('atb_ublox_gps'),
+                    'config',
+                    'zed_f9p_rover.yaml'
+                ])
     ublox_rover_node = Node(package='ublox_gps',
-                                             name='rover',
+                                             name='gps_node',
+                                             namespace='rover',
                                              executable='ublox_gps_node',
                                              output='both',
                                              parameters=[rover_params])
     
-    base_params = os.path.join(config_directory, 'zed_f9p_base.yaml')
+    base_params = PathJoinSubstitution([
+                    FindPackageShare('atb_ublox_gps'),
+                    'config',
+                    'zed_f9p_base.yaml'
+                ])
+    
     ublox_base_node = Node(package='ublox_gps',
-                                            name='base',
-                                             executable='ublox_gps_node',
-                                             output='both',
-                                             parameters=[base_params],
-                                             remappings=[('/rtcm', '/ntrip_client/rtcm')]
-                                             )
-    ntrip_client_node = Node(package='ublox_gps',
-                                        name='base',
+                                            name='gps_node',
+                                            namespace='base',
                                             executable='ublox_gps_node',
                                             output='both',
                                             parameters=[base_params],
@@ -66,38 +70,10 @@ def generate_launch_description():
                                             )
 
 
-    return launch.LaunchDescription([ublox_rover_node,
+    return LaunchDescription([ublox_rover_node,
                                      ublox_base_node,
                                      IncludeLaunchDescription(
                                         PythonLaunchDescriptionSource([
-                                            FindPackageShare("ntrip_client"), '/launch', '/gazebo.launch.py'])
-            )
+                                            FindPackageShare("ntrip_client"), '/launch', '/ntrip_client.launch.py']))
                                      ])
 
-
-
-# <launch>
-#   <arg name="output"              default="screen" />
-#   <arg name="respawn"             default="true" />
-#   <arg name="respawn_delay"       default="30" />
-#   <arg name="clear_params"        default="true" />
-
-#   <node pkg="ublox_gps" type="ublox_gps" name="rover"
-#         output="$(arg output)"
-#         clear_params="$(arg clear_params)"
-#         respawn="$(arg respawn)"
-#         respawn_delay="$(arg respawn_delay)">
-#     <rosparam command="load"
-#               file="$(find ublox_gps)/config/zed_f9p_rover.yaml" />
-#   </node>
-
-#   <node pkg="ublox_gps" type="ublox_gps" name="base"
-#         output="$(arg output)"
-#         clear_params="$(arg clear_params)"
-#         respawn="$(arg respawn)"
-#         respawn_delay="$(arg respawn_delay)">
-#     <rosparam command="load"
-#               file="$(find ublox_gps)/config/zed_f9p_base.yaml" />
-#     <remap from="/rtcm" to="/ntrip_client/rtcm" />
-#   </node>
-# </launch>

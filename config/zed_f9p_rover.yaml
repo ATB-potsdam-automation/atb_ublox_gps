@@ -1,4 +1,4 @@
-rover:
+rover/gps_node:
   ros__parameters:
     device: /dev/rover
     frame_id: rover
@@ -9,11 +9,14 @@ rover:
       baudrate: 460800
       in: 32
       out: 0
+    usb:
+      in: 32
+      out: 32
     config_on_startup: False
     nav:
         rate: 8
         
     publish:
-      all: true
-      nmea: true
+      all: True
+      nmea: True
 

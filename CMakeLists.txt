@@ -34,10 +34,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-install(DIRECTORY include/
-  DESTINATION include/${PROJECT_NAME}
-)
-
 install(
   DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}

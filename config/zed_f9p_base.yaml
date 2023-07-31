@@ -1,4 +1,4 @@
-base:
+base/gps_node:
   ros__parameters:
     device: /dev/base
     frame_id: base
