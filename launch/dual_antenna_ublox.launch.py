@@ -74,6 +74,7 @@ def generate_launch_description():
                                      ublox_base_node,
                                      IncludeLaunchDescription(
                                         PythonLaunchDescriptionSource([
-                                            FindPackageShare("ntrip_client"), '/launch', '/ntrip_client.launch.py']))
+                                            FindPackageShare("ntrip_client"), '/launch', '/ntrip_client.launch.py']), launch_arguments = {'config_file': "sapos_ntrip_atb3.yaml"}.items()
+                                        )
                                      ])
 
