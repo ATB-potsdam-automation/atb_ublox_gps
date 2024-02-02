@@ -1,6 +1,6 @@
 base/gps_node:
   ros__parameters:
-    device: /dev/base
+    device: /dev/ttyACM0
     frame_id: base
     uart1:
       baudrate: 460800

@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+    <xacro:property name="nav_length" value="1.2" />
+    <xacro:property name="nav_width" value="0.1"/>
+
+
+
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${nav_length} ${nav_width} ${nav_width}"/>
+            </geometry>
+            <material name="white"/>
+            <origin xyz="0 0 ${nav_width / 2}" rpy="0 0 0"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${nav_length} ${nav_width} ${nav_width}"/>
+            </geometry>
+            <origin xyz="0 0 ${nav_width / 2}" rpy="0 0 0"/>                         
+        </collision>
+        <!-- <xacro:box_inertia m="0.5" l="${nav_length}" w="${nav_width}" h="${nav_width}" -->
+                           <!-- xyz="0 0 ${nav_width / 2}" rpy="0 0 0" /> -->
+    </link>
+
+    <link name="gps_link">
+    </link>
+
+
+    <link name="imu_link">
+        <visual>
+            <geometry>
+                <box size="0.0384 0.0488 0.0236"/>
+            </geometry>
+            <material name="orange" />
+            <origin xyz="0 0 0.0118" rpy="0 0 0"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.0384 0.0488 0.0236"/>
+            </geometry>
+            <origin xyz="0 0 0.0118" rpy="0 0 0"/>            
+        </collision>
+        <xacro:box_inertia m="0.2" l="${nav_width}" w="${nav_width}" h="${nav_width}"
+                           xyz="0 0 ${nav_width}" rpy="0 0 0" />
+    </link>
+
+
+   <joint name="base_imu_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+        <origin xyz="0 0 ${nav_width}" rpy= "0 0 0"/>
+    </joint>
+
+
+    <xacro:macro name="gps_link" params="prefix">
+        <link name="${prefix}">
+            <visual>
+                <geometry>
+                    <box size="0.082 0.06 0.0225"/>
+                </geometry>
+                <material name="grey"/>
+                <origin xyz="0 0 ${nav_width / 20}" rpy="0 0 0"/>
+            </visual>
+            <collision>
+                 <geometry>
+                    <box size="0.082 0.06 0.0225" />
+                </geometry>
+                <origin xyz="0 0 ${nav_width / 20}" rpy="0 0 0"/>               
+            </collision>
+            <xacro:cylinder_inertia m="0.1" r="${nav_width}" h="${nav_width / 5}"
+                                    xyz="0 0 ${nav_width / 10}" rpy="0 0 0" />          
+        </link>  
+    </xacro:macro>
+
+    <xacro:gps_link prefix="rover"/>
+    <xacro:gps_link prefix="base"/>
+
+
+
+   <joint name="nav_gps_right_joint" type="fixed">
+        <parent link="gps_link"/>
+        <child link="rover"/>
+        <origin xyz="${nav_width * 4} 0 ${nav_width}" rpy= "0 0 0"/>
+    </joint>
+
+
+
+   <joint name="nav_gps_left_joint" type="fixed">
+        <parent link="gps_link"/>
+        <child link="base"/>
+        <origin xyz="${-nav_width * 4} 0 ${nav_width}" rpy= "0 0 0"/>
+    </joint>
+
+    <joint name="gps_base_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="gps_link"/>
+        <origin xyz="0 0 0" rpy= "0 0 0"/>
+    </joint>
+</robot>

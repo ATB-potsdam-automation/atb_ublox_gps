@@ -1,0 +1,34 @@
+ntrip_client:
+  ntrip_client_node:
+    ros__parameters:
+      host: sapos-bb-ntrip.de
+      port: 2101
+      mountpoint: VRS_3_4G_BB
+
+      ntrip_version: None
+      
+      authenticate: True
+      
+      username: user
+      password: pass
+      
+      ssl: False
+      
+      cert: None
+      key: None
+      
+      ca_cert: None
+      
+      
+      rtcm_frame_id: base
+      
+      nmea_max_length: 82
+      nmea_min_length: 3
+      
+      rtcm_message_package: rtcm_msgs
+      
+      reconnect_attempt_max: 10
+      reconnect_attempt_wait_seconds: 5
+      
+      rtcm_timeout_seconds: 4
+
