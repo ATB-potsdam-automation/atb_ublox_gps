@@ -43,6 +43,36 @@ from launch_ros.actions import Node
 from launch_ros.descriptions import ParameterValue
 from launch.substitutions import Command, PathJoinSubstitution, LaunchConfiguration
 from ament_index_python.packages import get_package_share_path
+from launch.launch_context import LaunchContext
+from launch.events.process.process_exited import ProcessExited
+from launch.actions import RegisterEventHandler
+from launch.event_handlers.on_process_exit import OnProcessExit
+
+def on_exit_restart(event:ProcessExited, context:LaunchContext):
+    print("\n\nProcess [{}] exited, pid: {}, return code: {}\n\n".format(
+        event.action.name, event.pid, event.returncode))
+    if event.returncode != 0 and 'ntrip_client' in event.action.name:
+        return ntrip_client_description() # respawn node action
+
+def ntrip_client_description():
+        ntrip_params = PathJoinSubstitution([
+                FindPackageShare('atb_ublox_gps'),
+                'config',
+                'params.yaml'
+                ])
+    
+        return Node(
+                name='ntrip_client_node',
+                namespace='ntrip_client',
+                package='ntrip_client',
+                executable='ntrip_ros',
+                output= 'both',
+                parameters=[ntrip_params],
+                remappings=[
+                 ("/ntrip_client/nmea", "/rover/nmea")
+                ],
+                arguments=['--ros-args', '--log-level', 'fatal']
+        )
 
 def generate_launch_description():   
     
@@ -72,25 +102,9 @@ def generate_launch_description():
                                             parameters=[base_params],
                                             remappings=[('/rtcm', '/ntrip_client/rtcm')]
                                             )
+    
+    ntrip_client_node = ntrip_client_description()
 
-    ntrip_params = PathJoinSubstitution([
-                FindPackageShare('atb_ublox_gps'),
-                'config',
-                'params.yaml'
-                ])
-    
-    
-    ntrip_client_node = Node(
-                name='ntrip_client_node',
-                namespace='ntrip_client',
-                package='ntrip_client',
-                executable='ntrip_ros',
-                output= 'both',
-                parameters=[ntrip_params],
-                remappings=[
-                 ("/ntrip_client/nmea", "/rover/nmea")
-                ],
-          )
     parameters_file_path = PathJoinSubstitution([
                 FindPackageShare('atb_ublox_gps'),
         'config', 'xsens_mti_node.yaml'])
@@ -121,14 +135,14 @@ def generate_launch_description():
                 FindPackageShare('atb_ublox_gps'),
         'config', 'dual_ekf_moving_base.yaml'])
     
-    #ekf_odom_node = Node(
-    #        package='robot_localization', 
-    #        executable='ekf_node', 
-    #        name='ekf_filter_node_odom',
-	#        output='screen',
-    #        parameters=[parameters_file_path],
-    #        remappings=[('odometry/filtered', '/odometry/local')]           
-    #       )
+    ekf_odom_node = Node(
+           package='robot_localization', 
+           executable='ekf_node', 
+           name='ekf_filter_node_odom',
+	       output='screen',
+           parameters=[parameters_file_path],
+           remappings=[('odometry/filtered', '/odometry/local')]           
+          )
     ekf_map_node = Node(
             package='robot_localization', 
             executable='ekf_node', 
@@ -156,6 +170,7 @@ def generate_launch_description():
                                      xsens_mti_node,
                                      robot_state_publisher_node,
                                      ekf_map_node,
-                                     navsat_node
+                                     navsat_node,
+                                     RegisterEventHandler(event_handler=OnProcessExit(on_exit=on_exit_restart))
                                      ])
 
