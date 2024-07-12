@@ -119,7 +119,7 @@ def generate_launch_description():
     
     parameters_file_path =  PathJoinSubstitution([
                 FindPackageShare('atb_ublox_gps'),
-        'config', 'dual_ekf_navsat_example.yaml'])
+        'config', 'dual_ekf_moving_base.yaml'])
     
     #ekf_odom_node = Node(
     #        package='robot_localization', 
@@ -143,7 +143,7 @@ def generate_launch_description():
             name='navsat_transform',
 	        output='screen',
             parameters=[parameters_file_path],
-            remappings=[('/imu', '/imu/data'),
+            remappings=[('/imu', '/rover/navheading'),
                         ('/gps/fix', '/rover/gps_node/fix'), 
                         ('odometry/gps', 'odometry/gps'),
                         ('/odometry/filtered', '/odometry/global')]           

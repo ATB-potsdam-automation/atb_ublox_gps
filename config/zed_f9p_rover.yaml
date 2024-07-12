@@ -1,6 +1,6 @@
 rover/gps_node:
   ros__parameters:
-    device: /dev/ttyACM1
+    device: /dev/rover
     frame_id: rover
     config_on_startup: False
     # TMODE3 Config
@@ -19,4 +19,5 @@ rover/gps_node:
     publish:
       all: True
       nmea: True
+      imu: True
 
